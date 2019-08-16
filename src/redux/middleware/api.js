@@ -20,46 +20,49 @@ export default store => next => action => {
 
   // 解耦fetch三状态
   const [requestType, successType, failureType] = types;
+  // 修正action,删除FETCH_DATA属性
+  const actionWith = (data) => {
+    const finalAction = {...action, ...data};
+    delete finalAction[FETCH_DATA];// 删除特殊属性
+    return finalAction;
+  }
+  // 派发修正过的action
+  const finalNext = (data) => {next(actionWith(data))}
 
-
-  finalNext({type: requestType}, action);//发出request状态
+  finalNext({type: requestType});//发出request状态
   return fetchData(endpoint, schema).then(response => {
     const data = {type: successType, response}
-    finalNext(data, action);//成功获取完数据
+    finalNext(data);//成功获取完数据
   }, err => {
     const data = {type: failureType, error: err.message || "获取数据失败!"};
-    finalNext(data, action);//获取数据失败
+    finalNext(data);//获取数据失败
   })
 }
 // 获取 data并序列化
 const fetchData = (endpoint, schema) => {
-  return get(endpoint).then(data => normalizeData(data, schema))
+  return get(endpoint).then(data =>{
+    return normalizeData(data, schema)
+  } )
 }
 // 根据schema扁平化data
 const normalizeData = (data, schema) => {
   let kvObj = {},
     ids = [];
-  const [id, name] = schema;
+  const {id, name} = schema;
+  
   // 返回值为array类型数据
   if (Array.isArray(data)) {
     data.forEach(item => {
       let key = item[id];
       kvObj[key] = item;
-      ids.push(item);
+      ids.push(key);
     });
   } else {
     let key = data[id];
     kvObj[key] = data;
-    ids.push(data);
+    ids.push(key);
   }
   return {[name]: kvObj, ids}
 }
 
-// 修正action,删除FETCH_DATA属性
-const actionWith = data => {
-  const finalAction = {...action, ...data};
-  delete finalAction[FETCH_DATA];// 删除特殊属性
-  return finalAction;
-}
-// 派发修正过的action
-const finalNext = (data, oldAction) => {next(actionWith(data, oldAction))}
+

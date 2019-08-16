@@ -2,7 +2,7 @@ const initialState = {
   error: null
 }
 export const actionTypes = {
-  CLEAR_ERROR: "APP/CLEAR_ERROR";
+  CLEAR_ERROR: "APP/CLEAR_ERROR"
 }
 export const actions = {
   clearError: () => ({
@@ -19,6 +19,6 @@ const reducer = (state = initialState, action) => {
 }
 
 //selectors
-export const getError = (state) => {state.app.error}
+export const getError = (state) => {return state.app.error}
 
 export default reducer;

@@ -9,7 +9,8 @@ export function get(url) {
     headers
   };
   return fetch(url, options).then(response => {
-    handleResponse(url, response)
+    // debugger
+    return handleResponse(url, response)
   }).catch(e => {
     console.error(`Request failed. url=${url},Message ${e}`);
     return Promise.reject({error: {message: "Request failed"}});
@@ -22,7 +23,7 @@ export function post(url, data) {
     body: data
   };
   return fetch(url, options).then(response => {
-    handleResponse(url, response)
+    return handleResponse(url, response)
   }).catch(e => {
     console.error(`Request failed. url=${url},Message ${e}`);
     return Promise.reject({error: {message: "Request failed"}});
@@ -30,7 +31,7 @@ export function post(url, data) {
 }
 // 对返回的数据根据status进行初步处理
 function handleResponse(url, data) {
-  if (response.status === 200)
+  if (data.status === 200)
     return data.json();
   else {
     console.error(`Request failed. url=${url}`);

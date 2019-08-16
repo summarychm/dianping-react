@@ -1,6 +1,6 @@
-import React, {Component} from 'react'
-import "./style";
-export default class ErrorToast extends Component {
+import React from 'react'
+import "./style.css";
+export default class ErrorToast extends React.Component {
   componetDidMount() {
     this.timer = setTimeout(() => {
       this.props.clearError();
@@ -14,8 +14,8 @@ export default class ErrorToast extends Component {
       </div>
     )
   }
-  componentWillUnMount() {
-    if (this.timer)
-      clearTimeout(this.timer)
-  }
+  // componentWillUnmount() {
+  //   if (this.timer)
+  //     clearTimeout(this.timer)
+  // }
 }
