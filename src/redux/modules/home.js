@@ -88,8 +88,9 @@ const likes = (state = initialState.likes, action) => {
       return {
         ...state,
         isFetching: false,
+        pageCount:state.pageCount+1,
         // 合并ids
-        ids: state.ids.connect(action.response.ids)
+        ids: state.ids.concat(action.response.ids)
       }
     case actionTypes.FETCH_LIKES_FAILURE:
       return {...state, isFetching: false}; // 详情
