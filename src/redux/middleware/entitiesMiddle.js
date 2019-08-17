@@ -23,26 +23,29 @@ export default store => next => action => {
   const [typeRequestStart, typeRequestSuccess, typeRequestFailure] = types;
 
   // 使用之后的dispatch处理修正后的action
-  const finalNext = (data) => next(tools.actionWith(data, action));
+  const finalNext = (data) => next(tools.actionWith(action,data));
 
-  finalNext({type: typeRequestStart});
+  finalNext({type: typeRequestStart});//向下派发requestStart指令
   // 发起网络请求
   return tools.fetchData(endpoint, schema).then(response => {
-    finalNext({type: typeRequestSuccess, response});//成功获取完数据
+    //数据扁平化后,向下派发requestSuccess指令,携带response属性,
+    // 继续让领域实体自身的reducer拦截该action,获取扁平化后的数据
+    finalNext({type: typeRequestSuccess, response});
   }, err => {
-    finalNext({type: typeRequestFailure, error: err.message || "获取数据失败!"});//获取数据失败
+    finalNext({type: typeRequestFailure, error: err.message || "获取数据失败!"});
   });
 }
 
 // 涉及的内部方法
 const tools = {
   // 修正action,删除FETCH_DATA属性
-  actionWith: (data,action) => {
+  actionWith: (action,data) => {
     const finalAction = {...action, ...data};
-    delete finalAction[FETCH_DATA];// 删除特殊属性
+    // 因为当前中间件已经缓存了FETCH_DATA属性,所以可以直接删除掉该属性
+    delete finalAction[FETCH_DATA];
     return finalAction;
   },
-  // 获取 data并序列化
+  // 获取entities实体的data集合
   fetchData: (endpoint, schema) => {
     return get(endpoint).then(data => {
       return tools.normalizeData(data, schema)
@@ -50,9 +53,9 @@ const tools = {
   },
   // 根据schema扁平化data
   normalizeData: (data, schema) => {
-    let kvObj = {},
-      ids = [];
-    const {id, name} = schema;
+    let kvObj = {},// 存储片平滑后的obj
+      ids = []; // 存储obj的顺序
+    const {id, name} = schema;// 从schema解构出name和id
 
     // 返回值为array类型数据
     if (Array.isArray(data)) {

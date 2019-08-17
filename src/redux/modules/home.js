@@ -1,7 +1,20 @@
+//! ids 和 entities分开存储
+// modules中只保存ids,存储顺序.
+// entities 储存真正的数据内容
+
 import {combineReducers} from 'redux';
-import url from "../../utils/url";
+
+import urls from "../../utils/urls"; // url信息
 import {FETCH_DATA} from "../middleware/entitiesMiddle";
-import {schema} from "./entities/products";
+import {schema} from "./entities/products"; //涉及到的数据实体
+
+// 请求参数使用到的常量对象
+const params = {
+  PATH_LIKES: "likes",
+  PATH_DISCOUNTS: "discounts",
+  PAGE_SIZE_LIKES: 5,
+  PAGE_SIZE_DISCOUNTS: 3
+};
 
 const initialState = {
   likes: {
@@ -14,7 +27,8 @@ const initialState = {
     ids: []
   },
 };
-//构造自定义中间件所需的action(3状态type,utl,schema)
+
+// 构建用于获取当前module对应sentities的action(简化样板代码)
 const getFetchLikes = (endpoint) => ({
   [FETCH_DATA]: {
     types: [
@@ -26,7 +40,7 @@ const getFetchLikes = (endpoint) => ({
     schema,
   },
 });
-// 
+// 构建用于获取当前module对应sentities的action(简化样板代码)
 const getFetchDiscounts = (endpoint) => ({
   [FETCH_DATA]: {
     types: [
@@ -39,13 +53,7 @@ const getFetchDiscounts = (endpoint) => ({
   },
 });
 
-// 请求参数使用到的常量对象
-export const params = {
-  PATH_LIKES: "likes",
-  PATH_DISCOUNTS: "discounts",
-  PAGE_SIZE_LIKES: 5,
-  PAGE_SIZE_DISCOUNTS: 3
-};
+
 
 export const actionTypes = {
   // likes
@@ -64,22 +72,22 @@ export const actions = {
     return (dispatch, getState) => {
       const {pageCount} = getState().home.likes;
       const rowIndex = pageCount * params.PAGE_SIZE_LIKES;
-      const endpoint = url.getProductList(params.PATH_LIKES, rowIndex, params.PAGE_SIZE_LIKES);
+      const endpoint = urls.getProductList(params.PATH_LIKES, rowIndex, params.PAGE_SIZE_LIKES);
       return dispatch(getFetchLikes(endpoint));
     }
   },
-  //加载特惠商品
+  //加载特惠商品 actions
   loadDiscounts: () => {
     return (dispatch, getState) => {
       const {ids} = getState().home.discounts;
       if (ids && ids.length) return null;
-      const endpoint = url.getProductList(params.PATH_DISCOUNTS, 0, params.PAGE_SIZE_DISCOUNTS);
+      const endpoint = urls.getProductList(params.PATH_DISCOUNTS, 0, params.PAGE_SIZE_DISCOUNTS);
       return dispatch(getFetchDiscounts(endpoint));
     }
   }
 }
 
-// reducers
+// 猜你喜欢 reducers
 const likes = (state = initialState.likes, action) => {
   switch (action.type) {
     case actionTypes.FETCH_LIKES_REQUEST:
@@ -88,9 +96,8 @@ const likes = (state = initialState.likes, action) => {
       return {
         ...state,
         isFetching: false,
-        pageCount:state.pageCount+1,
-        // 合并ids
-        ids: state.ids.concat(action.response.ids)
+        pageCount: state.pageCount + 1,
+        ids: state.ids.concat(action.response.ids)// 合并ids
       }
     case actionTypes.FETCH_LIKES_FAILURE:
       return {...state, isFetching: false}; // 详情
@@ -98,6 +105,7 @@ const likes = (state = initialState.likes, action) => {
       return state;
   }
 }
+// 特惠信息 reducer
 const discounts = (state = initialState.discounts, action) => {
   switch (action.type) {
     case actionTypes.FETCH_DISCOUNTS_REQUEST:
@@ -106,8 +114,7 @@ const discounts = (state = initialState.discounts, action) => {
       return {
         ...state,
         isFetching: false,
-        // 合并ids
-        ids: state.ids.concat(action.response.ids)
+        ids: state.ids.concat(action.response.ids)// 合并ids
       }
     case actionTypes.FETCH_DISCOUNTS_FAILURE:
       return {...state, isFetching: false}; // 详情
@@ -121,17 +128,19 @@ const reducer = combineReducers({
 });
 
 // selectors
-// 获取猜你喜欢state
-export const getLikes = state => {
-  return state.home.likes.ids.map(id => state.entities.products[id])
-};
-// 获取特惠商品state
-export const getDiscounts = state => {
-  return state.home.discounts.ids.map(id => {
-    return state.entities.products[id]
-  })
+export const selectorsHome = {
+  // 获取猜你喜欢state
+  getLikes: state => {
+    return state.home.likes.ids.map(id => state.entities.products[id])
+  },
+  // 获取特惠商品state
+  getDiscounts: state => {
+    return state.home.discounts.ids.map(id => {
+      return state.entities.products[id]
+    })
+  },
+  // 猜你喜欢当前分页码
+  getPageCountOfLikes: state => (state.home.likes.pageCount)
 }
-// 猜你喜欢当前分页码
-export const getPageCountOfLikes = state => (state.home.likes.pageCount)
 
 export default reducer;

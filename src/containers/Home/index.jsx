@@ -16,16 +16,14 @@ import LikeList from "./components/LikeList";
 // redux
 import {
   actions as homeActions,
-  getLikes,
-  getDiscounts,
-  getPageCountOfLikes
+  selectorsHome
 } from '../../redux/modules/home';
 
 class Home extends Component {
   componentDidMount() {
     this.props.homeActions.loadDiscounts();
   }
-  fetchMoreLikes=()=>{
+  fetchMoreLikes = () => {
     this.props.homeActions.loadLikes();
   }
   render() {
@@ -35,19 +33,19 @@ class Home extends Component {
         <HomeHeader />
         <Banner />
         <Category />
-        <Headline/>
-        <Activity/>
+        <Headline />
+        <Activity />
         <Discount data={discounts} />
         <LikeList data={likes} pageCount={pageCount} fetchData={this.fetchMoreLikes} />
-        <Footer/>
+        <Footer />
       </div>
     )
   }
 }
 const mapStateToProps = (state, props) => ({
-  likes: getLikes(state),
-  discounts: getDiscounts(state),
-  pageCount: getPageCountOfLikes(state)
+  likes: selectorsHome.getLikes(state),
+  discounts: selectorsHome.getDiscounts(state),
+  pageCount: selectorsHome.getPageCountOfLikes(state)
 })
 const mapDispatchToProps = (dispatch, props) => ({
   homeActions: bindActionCreators(homeActions, dispatch)

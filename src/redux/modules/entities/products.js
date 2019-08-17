@@ -1,15 +1,19 @@
+//! ids 和 entities分开存储
+// modules中只保存ids,存储顺序.
+// entities 储存真正的数据内容
+
 const schemaName = 'products'
 
-// 用于fetch扁平化表结构
+// 用于扁平化response结构
 export const schema = {
-  name: schemaName,
-  id: 'id'
+  name: schemaName, // 实体名
+  id: 'id' //实体主键索引
 }
+//reducer 提取action.response中[schemaName]类型的
 const reducer = (state = {}, action) => {
-  // 监控action中是否有response类型的数据,提取其中的products数据
+  //! 如果action.response[schemaName]有值,则将其缓存到entities集合中
   if (action.response && action.response[schemaName])
     return {...state, ...action.response[schemaName]};
-  //! ids还未处理
   return state;
 }
 
