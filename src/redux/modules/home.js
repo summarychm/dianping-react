@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux';
 import url from "../../utils/url";
-import {FETCH_DATA} from "../middleware/api";
+import {FETCH_DATA} from "../middleware/entitiesMiddle";
 import {schema} from "./entities/products";
 
 const initialState = {
