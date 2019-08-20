@@ -2,12 +2,12 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import Header from "../../components/Header";
-import ProductOverview from "./components/ProductOverview";
-import ShopInfo from "./components/Shopinfo";
-import Detail from "./components/Detail";
-import Remark from "./components/Remark";
-import BuyButton from "./components/BuyButton";
+import Header from "../../components/Header/index.jsx";
+import ProductOverview from "./components/ProductOverview/index.jsx";
+import ShopInfo from "./components/Shopinfo/index.jsx";
+import Detail from "./components/Detail/index.jsx";
+import Remark from "./components/Remark/index.jsx";
+import BuyButton from "./components/BuyButton/index.jsx";
 
 import {actionsDetail, selectorDetail} from "../../redux/modules/detail";
 
