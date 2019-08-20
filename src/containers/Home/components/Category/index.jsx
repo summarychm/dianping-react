@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import Slider from "react-slick";
 import './style.css'
 import dataSource from './categoryData';
-console.log(dataSource)
 class Category extends Component {
   render() {
     const settings = {

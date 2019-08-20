@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 import LikeItem from "../LikeItem";
+
 import Loading from "../../../../components/Loading";
 import "./styles.css"
-
 
 export default class LikeList extends Component {
   constructor(props) {
@@ -18,9 +18,8 @@ export default class LikeList extends Component {
     const likeListTop = this.myRef.current.offsetTop;
     // 猜你喜欢自身的高度
     const likeListHeight = this.myRef.current.offsetHeight;
-    // 
     if (scrollTop >= (likeListHeight + likeListTop - screenHeight))
-      this.props.fetchData();
+      this.props.fetchData(); // 加载新数据
   }
   componentDidMount() {
     if (this.props.pageCount < 3)

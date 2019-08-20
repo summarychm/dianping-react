@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-//component
+// component
 import Activity from "./components/Activity";
 import Banner from "./components/Banner";
 import Category from "./components/Category";
@@ -14,17 +14,14 @@ import LikeList from "./components/LikeList";
 
 
 // redux
-import {
-  actions as homeActions,
-  selectorsHome
-} from '../../redux/modules/home';
+import {actionsHome, selectorsHome} from '../../redux/modules/home';
 
 class Home extends Component {
   componentDidMount() {
-    this.props.homeActions.loadDiscounts();
+    this.props.actionsHome.loadDiscounts();
   }
   fetchMoreLikes = () => {
-    this.props.homeActions.loadLikes();
+    this.props.actionsHome.loadLikes();
   }
   render() {
     const {likes, discounts, pageCount} = this.props;
@@ -35,7 +32,9 @@ class Home extends Component {
         <Category />
         <Headline />
         <Activity />
+        {/* 特惠商品 */}
         <Discount data={discounts} />
+        {/* 猜你喜欢 */}
         <LikeList data={likes} pageCount={pageCount} fetchData={this.fetchMoreLikes} />
         <Footer />
       </div>
@@ -43,11 +42,11 @@ class Home extends Component {
   }
 }
 const mapStateToProps = (state, props) => ({
-  likes: selectorsHome.getLikes(state),
-  discounts: selectorsHome.getDiscounts(state),
+  likes: selectorsHome.getLikes(state),//猜你喜欢信息
+  discounts: selectorsHome.getDiscounts(state),//特惠商品
   pageCount: selectorsHome.getPageCountOfLikes(state)
 })
 const mapDispatchToProps = (dispatch, props) => ({
-  homeActions: bindActionCreators(homeActions, dispatch)
+  actionsHome: bindActionCreators(actionsHome, dispatch)
 })
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

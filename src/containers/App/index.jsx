@@ -3,20 +3,20 @@ import {bindActionCreators} from 'redux';
 import {connect} from "react-redux";
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 
-import ErrorToast from "../../components/ErrorToast";
 import Home from '../Home';
+import ProductDetail from '../ProductDetail';
+import ErrorToast from "../../components/ErrorToast";
 
-// actions,selectors
 import {actions as actionsApp, selectorApp} from '../../redux/modules/app';
 
 class App extends React.Component {
   render() {
-    // 从state中解构error信息
     const {error, actionsApp: {clearError}} = this.props;
     return (
       <div className="App">
         <Router>
           <Switch>
+            <Route path='/detail/:id' component={ProductDetail} />
             <Route path='/' component={Home} />
           </Switch>
         </Router>
@@ -27,7 +27,7 @@ class App extends React.Component {
 }
 const mapStateToProps = (state, props) => {
   return {
-    error: selectorApp.getError(state)
+    error: selectorApp.getError(state)// 从appStare中获取error信息
   }
 }
 const mapDispatchToProps = (dispatch, props) => {
