@@ -52,7 +52,7 @@ class Detail extends Component {
         <div className="detail__more">
           <span>更多图文详情</span>
           <span className="detail__notice">
-            (建议Wifi环境下打卡，土豪请随意)
+            (建议WiFi环境下打卡，土豪请随意)
           </span>
           <i className="detail__arrow" />
         </div>

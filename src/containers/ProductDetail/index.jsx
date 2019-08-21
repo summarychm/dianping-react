@@ -57,8 +57,8 @@ class ProductDetail extends Component {
 const mapStateToProps = (state, props) => {
   const productId = props.match.params.id;
   return {
-    product: selectorDetail.getProduct(state, productId),
-    relatedShop: selectorDetail.getRelateShop(state, productId)
+    product: selectorDetail.getProduct(state, productId), //商品信息
+    relatedShop: selectorDetail.getRelateShop(state, productId)// 店铺信息
   }
 }
 const mapDispatchToProps = (dispatch) => {
