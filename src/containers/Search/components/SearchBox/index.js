@@ -23,7 +23,10 @@ class SearchBox extends Component {
         {
           this.props.relatedKeywords.map(item => {
             return (
-              <li key={item.id} onClick={this.handleClickItem.bind(this, item)} className="searchBox__item">
+              <li key={item.id}
+                onClick={() => this.handleClickItem(item)}
+                className="searchBox__item"
+              >
                 <span className="searchBox__itemKeyworld">{item.keyword}</span>
                 <span className="searchBox__itemQuantity">约{item.quantity}个结果</span>
               </li>

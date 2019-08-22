@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import "./style.css"
 
 class SearchHistory extends Component {
@@ -10,8 +10,11 @@ class SearchHistory extends Component {
         <div className="searchHistory__header">搜索记录</div>
         <ul className="searchHistory__list">
           {
-            data.map((item, index) =>{
-              return <li key={item.id} onClick={this.handleClick.bind(this, item)}className="searchHistory__item">
+            data.map((item, index) => {
+              return <li key={item.id}
+                onClick={() => this.handleClick(item)}
+                className="searchHistory__item"
+              >
                 {item.keyword}
               </li>
             })
