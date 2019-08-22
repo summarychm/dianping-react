@@ -11,5 +11,5 @@ export default reducer;
 
 // selectors
 export const getKeywordById = (state, id) => {
-  return state.entities.keywords[id];
+  return state.entities[schemaName][id];
 }

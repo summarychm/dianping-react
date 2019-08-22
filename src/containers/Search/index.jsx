@@ -44,7 +44,10 @@ class Search extends Component {
   }
   // 更新搜索框文本到redux
   handleChangeInput = text => {
-    this.props.actionSearch.setInputText(text);
+    const {setInputText,loadRelatedKeywords}=this.props.actionSearch;
+    setInputText(text);
+    loadRelatedKeywords(text);
+
   }
   // 清除搜索框文本
   handleClearInput = () => {
@@ -52,7 +55,6 @@ class Search extends Component {
   }
   // 取消搜索
   handleCancel = () => {
-    this.handleClearInput();// 清除搜索框
     this.props.history.goBack();// 返回上一页
   }
   // 点击关键词逻辑
@@ -67,8 +69,7 @@ class Search extends Component {
   }
   // 卸载前
   componentWillUnmount() {
-    // 清空搜索框
-    this.props.actionSearch.clearInputText();
+    this.props.actionSearch.clearInputText();// 清空搜索框
   }
 }
 

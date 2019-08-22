@@ -85,7 +85,7 @@ const tools = {
     }
   },
   // reducer 历史记录
-  reducerHistoryKeywords: (state = tool.initialState.historyKeywords, action) => {
+  reducerHistoryKeywords: (state = tools.initialState.historyKeywords, action) => {
     switch (action.type) {
       case actionTypes.ADD_HISTORY_KEYWORD:
         const data = state.filter(item => item !== action.text)
@@ -100,12 +100,12 @@ const tools = {
   fetchPopularKeywords: (endpoint) => ({
     [FETCH_DATA]: {
       types: [
-        types.FETCH_POPULAR_KEYWORDS_REQUEST,
-        types.FETCH_POPULAR_KEYWORDS_SUCCESS,
-        types.FETCH_POPULAR_KEYWORDS_FAILURE
+        actionTypes.FETCH_POPULAR_KEYWORDS_REQUEST,
+        actionTypes.FETCH_POPULAR_KEYWORDS_SUCCESS,
+        actionTypes.FETCH_POPULAR_KEYWORDS_FAILURE
       ],
       endpoint,
-      schema: keywordSchema
+      schema: schemaKeywords
     }
   }),
   // 获取相关关键字
@@ -172,11 +172,11 @@ export const actionSearch = {
   }),
   //历史查询记录相关action
   addHistoryKeyword: keywordId => ({
-    type: types.ADD_HISTORY_KEYWORD,
+    type: actionTypes.ADD_HISTORY_KEYWORD,
     text: keywordId
   }),
   clearHistoryKeywords: () => ({
-    type: types.CLEAR_HISTORY_KEYWORDS
+    type: actionTypes.CLEAR_HISTORY_KEYWORDS
   })
 }
 // reducer
@@ -197,14 +197,13 @@ export const selectorKeywords = {
   },
   // 获取关联关键词
   getRelatedKeywords: state => {
-    // 获取用户输入
-    const text = selectorKeywords.getInputText(state);
+    const text = state.search.inputText;// 用户输入
     if (!text || text.trim().length === 0) return [];
-    // 查找缓存,根据text查找
+    // 根据text查找缓存
     const relatedKeywords = state.search.relatedKeywords[text];
     if (!relatedKeywords) return [];
     // 获取最新的关键词集合
-    return relatedKeywords.ids.map(id => getKeywordById(id))
+    return relatedKeywords.ids.map(id => getKeywordById(state,id))
   },
   // 获取用户输入
   getInputText: state => {

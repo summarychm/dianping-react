@@ -113,7 +113,7 @@ export const actionsHome = {
   loadDiscounts: () => {// 加载特惠商品 actions
     return (dispatch, getState) => {
       const {ids} = getState().home.discounts;
-      if (ids && ids.length) return null;
+      if (ids && ids.length) return null; // 读取缓存
       const endpoint = urls.getProductList(tools.params.PATH_DISCOUNTS, 0, tools.params.PAGE_SIZE_DISCOUNTS);
       return dispatch(tools.getFetchDiscounts(endpoint));
     }
