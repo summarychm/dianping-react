@@ -9,7 +9,7 @@ class SearchBox extends Component {
       <div className="searchBox">
         <div className="searchBox__container">
           <input className="searchBox__text" value={inputText} onChange={this.handleChange} />
-          <span className="searchBox__clear" onClick={this.handleClear}></span>
+          {inputText && <span className="searchBox__clear" onClick={this.handleClear}></span>}
           <span className="searchBox__cancel" onClick={this.handleCancel}>取消</span>
         </div>
         {(relatedKeywords.length > 0) && this.renderSuggestList()}
