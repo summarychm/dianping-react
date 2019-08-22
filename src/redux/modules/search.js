@@ -3,6 +3,7 @@ import {combineReducers} from 'redux';
 import urls from "../../utils/urls";
 import {FETCH_DATA} from "../middleware/entitiesMiddle";
 import {schemaKeywords, getKeywordById} from "./entities/keywords";
+import {schemaShop, selectorShop} from "./entities/shops";
 
 const tools = {
   initialState: {
@@ -21,7 +22,17 @@ const tools = {
      * }
      */
     relatedKeywords: {},
-    historyKeywords: []// 搜索历史记录
+    historyKeywords: [],// 搜索历史记录
+    /**
+    * searchedShopsByKeywords结构
+    * {
+    *   'keywordId': {
+    *       isFetching: false,
+    *       ids: []
+    *    }
+    * }
+    */
+    searchedShopsByKeyword: {}
   },
   // reducer 搜索文本
   reducerInputText: (state = tools.initialState.inputText, action) => {
@@ -54,7 +65,7 @@ const tools = {
         return state;
     }
   },
-  // reducer 关联关键词
+  // reducer 关联关键词,内涵子reducer
   reducerRelatedKeyWords: (state = tools.initialState.relatedKeywords, action) => {
     //! 这里的层级关系为关键字单独对应一个关键词集合
     //! 所以将所有相关处理再进行抽取到子reducer进行处理
@@ -76,9 +87,42 @@ const tools = {
         return {
           ...state,
           isFetching: false,
+          // 获取列表顺序
           ids: [...state.ids, ...action.response.ids]
         };
       case actionTypes.FETCH_RELATED_KEYWORDS_FAILURE:
+        return {...state, isFetching: false};
+      default:
+        return state;
+    }
+  },
+  // reducer 根据关键词获取店铺列表,内涵子reducer
+  reducerSearchedShopByKeyword: (state = tools.initialState.searchedShopsByKeyword, action) => {
+    switch (action.type) {
+      case actionTypes.FETCH_SHOPS_REQUEST:
+      case actionTypes.FETCH_SHOPS_SUCCESS:
+      case actionTypes.FETCH_SHOPS_FAILURE:
+        return {
+          ...state,
+          [action.text]: tools.reducerSearchedShopsByText(state[action.text], action)
+        };
+      default:
+        return state;
+    }
+  },
+  // reducer 搜索店铺列表的子reducer,对应关键词集合的某一键值对
+  reducerSearchedShopsByText: (state = {isFetching: false, ids: []}, action) => {
+    switch (action.type) {
+      case actionTypes.FETCH_SHOPS_REQUEST:
+        return {...state, isFetching: true};
+      case actionTypes.FETCH_SHOPS_SUCCESS:
+        return {
+          ...state,
+          isFetching: false,
+          //! 获取列表顺序,每次都取最新?
+          ids: action.response.ids
+        };
+      case actionTypes.FETCH_SHOPS_FAILURE:
         return {...state, isFetching: false};
       default:
         return state;
@@ -121,6 +165,19 @@ const tools = {
     },
     text
   }),
+  // 获取店铺信息
+  fetchRelatedShops: (text, endpoint) => ({
+    [FETCH_DATA]: {
+      types: [
+        actionTypes.FETCH_SHOPS_REQUEST,
+        actionTypes.FETCH_SHOPS_SUCCESS,
+        actionTypes.FETCH_SHOPS_FAILURE,
+      ],
+      endpoint,
+      schema: schemaShop
+    },
+    text
+  })
 }
 
 // actionTypes
@@ -138,7 +195,11 @@ export const actionTypes = {
   FETCH_POPULAR_KEYWORDS_FAILURE: "SEARCH/FETCH_POPULAR_KEYWORDS_FAILURE",
   // 历史查询记录
   ADD_HISTORY_KEYWORD: "SEARCH/ADD_HISTORY_KEYWORD",
-  CLEAR_HISTORY_KEYWORDS: "SEARCH/CLEAR_HISTORY_KEYWORDS"
+  CLEAR_HISTORY_KEYWORDS: "SEARCH/CLEAR_HISTORY_KEYWORDS",
+  // 查询店铺信息
+  FETCH_SHOPS_REQUEST: "SEARCH/FETCH_SHOPS_REQUEST",
+  FETCH_SHOPS_SUCCESS: "SEARCH/FETCH_SHOPS_SUCCESS",
+  FETCH_SHOPS_FAILURE: "SEARCH/FETCH_SHOPS_FAILURE",
 }
 // actions
 export const actionSearch = {
@@ -154,7 +215,7 @@ export const actionSearch = {
       return dispatch(tools.fetchPopularKeywords(endpoint));
     };
   },
-  //根据输入获取相关关键字
+  //根据输入查询相关关键字
   loadRelatedKeywords: text => {
     return (dispatch, getState) => {
       const {relatedKeywords} = getState().search;
@@ -163,13 +224,15 @@ export const actionSearch = {
       return dispatch(tools.fetchRelatedKeywords(text, endpoint));
     }
   },
-  setInputText: text => ({
-    type: actionTypes.SET_INPUT_TEXT,
-    text
-  }),
-  clearInputText: () => ({
-    type: actionTypes.CLEAR_INPUT_TEXT,
-  }),
+  // 根据输入查询店铺列表
+  loadRelatedShops: keyword => {
+    return (dispatch, getState) => {
+      const {searchedShopsByKeyword} = getState().search;
+      if (searchedShopsByKeyword[keyword]) return null;
+      const endpoint = urls.getRelatedShops(keyword);
+      return dispatch(tools.fetchRelatedShops(keyword, endpoint));
+    }
+  },
   //历史查询记录相关action
   addHistoryKeyword: keywordId => ({
     type: actionTypes.ADD_HISTORY_KEYWORD,
@@ -177,14 +240,22 @@ export const actionSearch = {
   }),
   clearHistoryKeywords: () => ({
     type: actionTypes.CLEAR_HISTORY_KEYWORDS
-  })
+  }),
+  setInputText: text => ({
+    type: actionTypes.SET_INPUT_TEXT,
+    text
+  }),
+  clearInputText: () => ({
+    type: actionTypes.CLEAR_INPUT_TEXT,
+  }),
 }
 // reducer
 const reducer = combineReducers({
   inputText: tools.reducerInputText,
   popularKeywords: tools.reducerPopularKeywords,
   relatedKeywords: tools.reducerRelatedKeyWords,
-  historyKeywords: tools.reducerHistoryKeywords
+  historyKeywords: tools.reducerHistoryKeywords,
+  searchedShopsByKeyword: tools.reducerSearchedShopByKeyword,
 })
 export default reducer;
 
@@ -203,14 +274,30 @@ export const selectorKeywords = {
     const relatedKeywords = state.search.relatedKeywords[text];
     if (!relatedKeywords) return [];
     // 获取最新的关键词集合
-    return relatedKeywords.ids.map(id => getKeywordById(state,id))
+    return relatedKeywords.ids.map(id => getKeywordById(state, id))
   },
-  // 获取用户输入
+  // 获取用户输入 
   getInputText: state => {
     return state.search.inputText;
   },
   // 获取用户输入
   getHistoryKeywords: state => {
     return state.search.historyKeywords.map(id => getKeywordById(state, id))
+  },
+  // 获取店铺列表
+  getSearchedShops: state => {
+    // 从历史记录中取最新一条记录的id
+    const keywordId = state.search.historyKeywords[0];
+    if (!keywordId) return [];
+    const shops = state.search.searchedShopsByKeyword[keywordId];
+    if (!shops || !shops.ids) return [];
+    return shops.ids.map(id => selectorShop.getShopById(state, id))
+  },
+  // 获取当前关键字
+  getCurrentKeyword: state => {
+    // 根据历史记录中最新一条记录的Id,获取关键字text
+    const keywordId = state.search.historyKeywords[0];
+    if (!keywordId) return "";
+    return getKeywordById(state, keywordId).keyword;
   }
 }

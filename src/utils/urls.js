@@ -3,5 +3,6 @@ export default {
   getProductDetail: (id) => `/mocks/product_detail/${id}.json`,
   getShopById: (id) => `/mocks/shops/${id}.json`,
   getPopularKeywords: () => '/mocks/keywords/popular.json',
-  getRelatedKeywords: (text) => `/mocks/keywords/related.json?keyword=${text}` 
+  getRelatedKeywords: (text) => `/mocks/keywords/related.json?keyword=${text}` ,
+  getRelatedShops: (keyword) => `/mocks/shops/related.json?keyword=${keyword}` 
 }

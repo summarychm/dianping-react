@@ -44,7 +44,7 @@ class Search extends Component {
   }
   // 更新搜索框文本到redux
   handleChangeInput = text => {
-    const {setInputText,loadRelatedKeywords}=this.props.actionSearch;
+    const {setInputText, loadRelatedKeywords} = this.props.actionSearch;
     setInputText(text);
     loadRelatedKeywords(text);
 
@@ -59,9 +59,11 @@ class Search extends Component {
   }
   // 点击关键词逻辑
   handleClickItem = (item) => {
-    let {setInputText, addHistoryKeyword} = this.props.actionSearch;
+    let {setInputText, addHistoryKeyword, loadRelatedShops} = this.props.actionSearch;
     setInputText(item.keyword); // 更新搜索框
     addHistoryKeyword(item.id); // 添加历史记录
+    loadRelatedShops(item.id); // 搜索店铺列表
+    this.props.history.push("/search_result");// 跳转到详情页
   }
   // 清空历史记录
   handleClearHistory = () => {

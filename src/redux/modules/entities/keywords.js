@@ -6,7 +6,7 @@ export const schemaKeywords = {
   id: "id"
 }
 
-const reducer = createReducer(schemaKeywords.name);
+const reducer = createReducer(schemaName);
 export default reducer;
 
 // selectors

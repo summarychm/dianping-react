@@ -1,18 +1,16 @@
 import createReducer from "../../../utils/createReducer";
 
+const schemaName = "shops";
 export const schemaShop = {
-  name: "shops",
+  name: schemaName,
   id: "id"
 };
 
 // 获取领域实体
-const reducer = createReducer(schemaShop.name);
+const reducer = createReducer(schemaName);
 export default reducer;
 
 // selectors
 export const selectorShop = {
-  getShopById: (state, id) => {
-    const shop = state.entities.shops[id];
-    return shop;
-  }
+  getShopById: (state, id) => state.entities[schemaName][id]
 };
