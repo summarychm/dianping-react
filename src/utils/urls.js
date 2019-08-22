@@ -4,5 +4,6 @@ export default {
   getShopById: (id) => `/mocks/shops/${id}.json`,
   getPopularKeywords: () => '/mocks/keywords/popular.json',
   getRelatedKeywords: (text) => `/mocks/keywords/related.json?keyword=${text}` ,
-  getRelatedShops: (keyword) => `/mocks/shops/related.json?keyword=${keyword}` 
+  getRelatedShops: (keyword) => `/mocks/shops/related.json?keyword=${keyword}` ,
+  getOrders: () => `/mocks/orders/orders.json`, 
 }

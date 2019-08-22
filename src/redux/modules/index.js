@@ -5,13 +5,15 @@ import search from "./search";
 import detail from './detail';
 import app from "./app";
 import login from "./login";
+import user from "./user";
 
 const rootReducer = combineReducers({
+  app,
+  login,
   entities,
   home,
   detail,
   search,
-  login,
-  app
+  user,
 });
 export default rootReducer;
