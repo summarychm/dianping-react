@@ -6,6 +6,7 @@ import detail from './detail';
 import app from "./app";
 import login from "./login";
 import user from "./user";
+import purchase from "./purchase";
 
 const rootReducer = combineReducers({
   app,
@@ -15,5 +16,6 @@ const rootReducer = combineReducers({
   detail,
   search,
   user,
+  purchase,
 });
 export default rootReducer;

@@ -25,14 +25,11 @@ class OrderItem extends Component {
         <div className="orderItem__bottom">
           <div className="orderItem__type">{channel}</div>
           <div>
-            {type === 1 && !commentId ? (
-              <div className="orderItem__btn" onClick={() => onComment(id)}>
-                评价
-              </div>
-            ) : null}
-            <div className="orderItem__btn" onClick={onRemove}>
-              删除
-            </div>
+          {/* 已消费 + 未评论 显示评论按钮 */}
+            {type === 1 && !commentId
+              ? (<div className="orderItem__btn" onClick={() => onComment(id)}>评价</div>)
+              : null}
+            <div className="orderItem__btn" onClick={onRemove}>删除</div>
           </div>
         </div>
         {isCommenting ? this.renderEditArea() : null}

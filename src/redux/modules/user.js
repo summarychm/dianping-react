@@ -72,6 +72,12 @@ const tools = {
           availableIds: tools.removeOrderId(state, "availableIds", action.orderId),
           refundIds: tools.removeOrderId(state, "refundIds", action.orderId),
         }
+      case orderActionTypes.ADD_ORDER:
+        return {
+          ...state,
+          ids: [...state.ids, action.orderId],
+          availableIds: [...state.availableIds, action.orderId]
+        }
       default:
         return state;
     }

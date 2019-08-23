@@ -18,8 +18,11 @@ export const constTypes = {
 // actionType
 export const actionTypes = {
   DELETE_ORDER: "ORDERS/DELETE_ORDER",//删除订单
-  ADD_COMMENT: "ORDERS/ADD_COMMENT" // 新增评论
+  ADD_COMMENT: "ORDERS/ADD_COMMENT", // 新增评论
+  ADD_ORDER: "ORDERS/ADD_ORDER",//增加订单
 }
+
+let orderIdCounter = 10;
 
 // actionCreator
 export const actionOrder = {
@@ -33,12 +36,26 @@ export const actionOrder = {
     type: actionTypes.ADD_COMMENT,
     orderId,
     commentId
-  })
+  }),
+  //增加订单
+  addOrder: order => {
+    const orderId = `o-${orderIdCounter++}`;
+    return {
+      type: actionTypes.ADD_ORDER,
+      orderId,
+      order: {...order, id: orderId}
+    }
+  },
 };
 
 const normalReducer = createReducer(schemaName)
 const reducer = (state = {}, action) => {
-  if (action.type === actionTypes.ADD_COMMENT) {
+  if (action.type === actionTypes.ADD_ORDER) {
+    return {
+      ...state,
+      [action.orderId]: action.order
+    }
+  } else if (action.type === actionTypes.ADD_COMMENT) {
     return {
       ...state,
       [action.orderId]: { //添加新的评论id
