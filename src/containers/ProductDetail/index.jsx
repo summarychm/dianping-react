@@ -14,6 +14,7 @@ import {actionsDetail, selectorDetail} from "../../redux/modules/detail";
 class ProductDetail extends Component {
   render() {
     const {product, relatedShop} = this.props;
+    console.log("product",product)
     return (
       <div>
         <Header title="团购详情" onBack={this.handleBack} grey />

@@ -18,6 +18,7 @@ export default reducer;
 export const selectorProduct = {
   getProductDetail: (state, id) => {
     const product = state.entities[schemaName][id];
+    console.log("id",id,"product",product)
     return (product && product.detail && product.purchaseNotes) ? product : null;
   },
   getProductById: (state, id) => {

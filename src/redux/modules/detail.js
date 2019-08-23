@@ -119,7 +119,7 @@ export default reducer;
 
 //selectors
 export const selectorDetail = {
-  getProduct: (state, id) => {
+  getProduct: (state, id) => { 
     return selectorProduct.getProductDetail(state, id);
   },
   getRelateShop: (state, productId) => {
