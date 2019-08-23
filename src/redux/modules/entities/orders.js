@@ -17,7 +17,8 @@ export const constTypes = {
 
 // actionType
 export const actionTypes = {
-  DELETE_ORDER: "ORDERS/DELETE_ORDER"//删除订单
+  DELETE_ORDER: "ORDERS/DELETE_ORDER",//删除订单
+  ADD_COMMENT: "ORDERS/ADD_COMMENT" // 新增评论
 }
 
 // actionCreator
@@ -26,13 +27,27 @@ export const actionOrder = {
   deleteOrder: (orderId) => ({
     type: actionTypes.DELETE_ORDER,
     orderId
+  }),
+  //新增评价
+  addComment: (orderId, commentId) => ({
+    type: actionTypes.ADD_COMMENT,
+    orderId,
+    commentId
   })
 };
 
 const normalReducer = createReducer(schemaName)
 const reducer = (state = {}, action) => {
-  // 处理删除订单实体action
-  if (action.type === actionTypes.DELETE_ORDER) {
+  if (action.type === actionTypes.ADD_COMMENT) {
+    return {
+      ...state,
+      [action.orderId]: { //添加新的评论id
+        ...state[action.orderId],
+        commentId: action.commentId
+      }
+    }
+  } else if (action.type === actionTypes.DELETE_ORDER) {
+    // 处理删除订单实体action
     const {[action.orderId]: deleteOrder, ...restOrders} = state;
     return restOrders;
   } else // 其他type继续交由默认的领域reducer进行监听

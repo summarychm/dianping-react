@@ -9,6 +9,7 @@ import {
   actionOrder,
   actionTypes as orderActionTypes
 } from "./entities/orders";
+import {actions as commentActions} from "./entities/comments";
 
 const tools = {
   initialState: {
@@ -23,7 +24,15 @@ const tools = {
     currentOrder: { // 当前选中的订单(可进行删除,评论等操作)
       id: null,
       isDeleting: false,
+      isCommenting: false,
+      comment: "",
+      stars: 0
     }
+  },
+  sleep: (time) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => resolve(), time)
+    });
   },
   fetchOrders: endpoint => ({
     [FETCH_DATA]: {
@@ -82,13 +91,26 @@ const tools = {
       case actionTypes.SHOW_DELETE_DIALOG:
         return {
           ...state,
-          id:action.orderId,
-          isDeleting:true
+          id: action.orderId,
+          isDeleting: true
         }
-      // 订单删除后,重置为初始值
+      case actionTypes.SHOW_COMMENT_AREA:
+        return {
+          ...state,
+          id: action.orderId,
+          isCommenting: true
+        };
+      case actionTypes.SET_COMMENT: // 实时更新评论
+        return {...state, comment: action.comment}
+      case actionTypes.SET_STARS: //评论打分
+        return {...state, stars: action.stars}
+      // 订单删除/评论订单后,重置为初始值
       case actionTypes.HIDE_DELETE_DIALOG:
       case actionTypes.DELETE_ORDER_SUCCESS:
       case actionTypes.DELETE_ORDER_FAILURE:
+      case actionTypes.HIDE_COMMENT_AREA:
+      case actionTypes.POST_COMMENT_SUCCESS:
+      case actionTypes.POST_COMMENT_FAILURE:
         return tools.initialState.currentOrder;
       default:
         return state;
@@ -103,10 +125,16 @@ const tools = {
     type: actionTypes.DELETE_ORDER_SUCCESS,
     orderId
   }),
-  // 删除state中指定类别中的订单信息
+  // 删除指定类别中的指定订单
   removeOrderId: (state, key, orderId) => {
     return state[key].filter(id => id !== orderId)
-  }
+  },
+  postCommentRequest: () => ({
+    type: actionTypes.POST_COMMENT_REQUEST
+  }),
+  postCommentSuccess: () => ({
+    type: actionTypes.POST_COMMENT_SUCCESS
+  }),
 }
 
 // actionType
@@ -124,6 +152,17 @@ export const actionTypes = {
   //删除确认对话框
   SHOW_DELETE_DIALOG: "USER/SHOW_DELETE_DIALOG",
   HIDE_DELETE_DIALOG: "USER/HIDE_DELETE_DIALOG",
+  //评价订单编辑
+  SHOW_COMMENT_AREA: "USER/SHOW_COMMENT_AREA",
+  HIDE_COMMENT_AREA: "USER/HIDE_COMMENT_AREA",
+  //编辑评价内容
+  SET_COMMENT: "USER/SET_COMMENT",
+  //打分
+  SET_STARS: "USER/SET_STARS",
+  //提交评价
+  POST_COMMENT_REQUEST: "USER/POST_COMMENT_REQUEST",
+  POST_COMMENT_SUCCESS: "USER/POST_COMMENT_SUCCESS",
+  POST_COMMENT_FAILURE: "USER/POST_COMMENT_FAILURE"
 };
 
 // actionCreator
@@ -167,7 +206,45 @@ export const actionUser = {
   //隐藏删除对话框
   hideDeleteDialog: () => ({
     type: actionTypes.HIDE_DELETE_DIALOG,
-  })
+  }),
+  //显示订单评价编辑框
+  showCommentArea: orderId => ({
+    type: actionTypes.SHOW_COMMENT_AREA,
+    orderId
+  }),
+  //显示订单评价编辑框
+  hideCommentArea: () => ({
+    type: actionTypes.HIDE_COMMENT_AREA
+  }),
+  //设置评价信息
+  setComment: comment => ({
+    type: actionTypes.SET_COMMENT,
+    comment
+  }),
+  // 设置评级等级
+  setStars: stars => ({
+    type: actionTypes.SET_STARS,
+    stars
+  }),
+  // 提交评价
+  submitComment: () => {
+    return (dispatch, getState) => {
+      dispatch(tools.postCommentRequest());
+      return tools.sleep(10).then(function () {
+        const {
+          currentOrder: {id, stars, comment}
+        } = getState().user;
+        const commentObj = {
+          id: +new Date(),
+          stars: stars,
+          content: comment
+        };
+        dispatch(tools.postCommentSuccess());// 评论成功
+        dispatch(commentActions.addComment(commentObj)); // 将评论添加到comments领域对象中
+        dispatch(actionOrder.addComment(id, commentObj.id));// 更新订单信息中的commitID
+      })
+    };
+  }
 };
 // reducer
 const reducer = combineReducers({
@@ -188,5 +265,19 @@ export const selectorUser = {
   // 获取正在删除的订单Id
   getDeletingOrderId: (state) => {
     return state.user.currentOrder && state.user.currentOrder.isDeleting ? state.user.currentOrder.id : null;
+  },
+  // 获取正在评价的订单id
+  getCommentingOrderId: state => {
+    return state.user.currentOrder && state.user.currentOrder.isCommenting
+      ? state.user.currentOrder.id
+      : null;
+  },
+  // 获取评论信息
+  getCurrentOrderComment: state => {
+    return state.user.currentOrder ? state.user.currentOrder.comment : "";
+  },
+  // 获取订单评级/打分
+  getCurrentOrderStars: state => {
+    return state.user.currentOrder ? state.user.currentOrder.stars : 0;
   }
 }

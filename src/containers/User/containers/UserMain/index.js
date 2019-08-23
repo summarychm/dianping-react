@@ -50,17 +50,25 @@ class UserMain extends Component {
       </div>
     );
   }
-
   componentDidMount() {
     this.props.actionUser.loadOrders()
   }
   renderOrderList = data => {
+    const {commentingOrderId, orderComment, orderStars} = this.props;
     return data.map(item => {
       return (
         <OrderItem
           key={item.id}
           data={item}
           onRemove={() => this.handleRemove(item.id)}
+          isCommenting={item.id === commentingOrderId}
+          comment={item.id === commentingOrderId ? orderComment : ""}
+          stars={item.id === commentingOrderId ? orderStars : 0}
+          onCommentChange={this.handleCommentChange}
+          onStarsChange={this.handleStarsChange}
+          onComment={this.handleComment.bind(this, item.id)}
+          onSubmitComment={this.handleSubmitComment}
+          onCancelComment={this.handleCancelComment}
         />
       );
     });
@@ -74,13 +82,15 @@ class UserMain extends Component {
       </div>
     );
   };
-
+  handleClickTab = index => {
+    this.props.actionUser.setCurrentTab(index);
+  };
   // 删除对话框
   renderConfirmDialog = () => {
     const {actionUser: {hideDeleteDialog, removeOrder}} = this.props;
     return (
       <Confirm
-        content="确定删除该订单吗?" 
+        content="确定删除该订单吗?"
         cancelText="取消"
         confirmText="确定"
         onCancel={hideDeleteDialog}
@@ -88,14 +98,48 @@ class UserMain extends Component {
       />
     );
   };
-
   handleRemove = orderId => {
-    console.log("orderId",orderId)
     this.props.actionUser.showDeleteDialog(orderId);
   };
 
-  handleClickTab = index => {
-    this.props.actionUser.setCurrentTab(index);
+  // 评价内容变化
+  handleCommentChange = comment => {
+    const {
+      actionUser: {setComment}
+    } = this.props;
+    setComment(comment);
+  };
+
+  // 订单评级变化
+  handleStarsChange = stars => {
+    const {
+      actionUser: {setStars}
+    } = this.props;
+    setStars(stars);
+  };
+
+  //选中当前要评价的订单
+  handleComment = orderId => {
+    const {
+      actionUser: {showCommentArea}
+    } = this.props;
+    showCommentArea(orderId);
+  };
+
+  //提交评价
+  handleSubmitComment = () => {
+    const {
+      actionUser: {submitComment}
+    } = this.props;
+    submitComment();
+  };
+
+  //取消评价
+  handleCancelComment = () => {
+    const {
+      actionUser: {hideCommentArea}
+    } = this.props;
+    hideCommentArea();
   };
 }
 
@@ -104,6 +148,9 @@ const mapStateToProps = (state, props) => {
     currentTab: selectorUser.getCurrentTab(state),
     deletingOrderId: selectorUser.getDeletingOrderId(state),
     orders: selectorUser.getOrders(state),
+    commentingOrderId: selectorUser.getCommentingOrderId(state),
+    orderComment: selectorUser.getCurrentOrderComment(state),
+    orderStars: selectorUser.getCurrentOrderStars(state)
   };
 };
 

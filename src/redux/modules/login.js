@@ -47,14 +47,6 @@ export const actionLogin = {
         localStorage.setItem('username', username);
         localStorage.setItem('login', true);
       });
-      // return new Promise((resolve, reject) => {
-      //   setTimeout(() => {
-      //     dispatch(loginSuccess());
-      //     localStorage.setItem('username', username);
-      //     localStorage.setItem('login', true);
-      //     resolve();
-      //   }, 1000);
-      // });
     };
   },
   logout: () => {
