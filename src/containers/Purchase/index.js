@@ -12,7 +12,7 @@ import {actionPurchase, selectorPurchase} from "../../redux/modules/purchase";
 
 class Purchase extends Component {
   render() {
-    const {product, phone, quantity, showTip} = this.props;
+    const {product, phone, quantity, showTip,totalPrice} = this.props;
     return (
       <div>
         <Header title="下单" onBack={this.handleBack} />
@@ -22,6 +22,7 @@ class Purchase extends Component {
             product={product}
             phone={phone}
             quantity={quantity}
+            totalPrice={totalPrice}
             onSubmit={this.handleSubmit}
             onSetQuantity={this.handleSetQuantity}
           />
@@ -70,6 +71,8 @@ const mapStateToProps = (state, props) => {
     quantity: selectorPurchase.getQuantity(state), // 
     showTip: selectorPurchase.getTipStatus(state), // 弹窗组件
     phone: selectorLogin.getUsername(state), // 从用户信息中获取手机号 
+    // reselect 将组件内的价格计算转移到redux中,并使用reselect进行缓存
+    totalPrice: selectorPurchase.getTotalPrice(state, productId),
   };
 };
 

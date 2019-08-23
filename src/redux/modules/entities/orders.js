@@ -74,7 +74,6 @@ export default reducer;
 
 // selectors
 export const selectorOrder = {
-  getOrderById: (state, id) => {
-    return state.entities[schemaName][id]
-  }
+  getOrderById: (state, id) => state.entities[schemaName][id],
+  getAllOrders: (state) => state.entities[schemaName],
 }

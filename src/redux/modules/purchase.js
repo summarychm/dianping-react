@@ -1,3 +1,4 @@
+import {createSelector} from 'reselect';
 import {selectorProduct} from "./entities/products"
 import {actionOrder, constTypes} from "./entities/orders"
 
@@ -90,5 +91,14 @@ export const selectorPurchase = {
   },
   getProduct: (state, id) => {
     return selectorProduct.getProductDetail(state, id)
+  },
+  // reselect 获取总价
+  getTotalPrice: (state, productId) => {
+    //! 因为reselect初始化时需要对应的select,但select对象还未初始化完成,
+    //! 所有这里在外面多包裹了一层函数,进行了延时触发.
+    return createSelector([selectorPurchase.getProduct, selectorPurchase.getQuantity], (product, quantity) => {
+      if (!product) product = 0
+      return (product.currentPrice * quantity).toFixed(2);
+    })(state,productId)
   }
 }

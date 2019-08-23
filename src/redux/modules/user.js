@@ -1,4 +1,5 @@
 import {combineReducers} from "redux"
+import {createSelector} from "reselect";
 
 import urls from "../../utils/urls";
 import {FETCH_DATA} from "../middleware/entitiesMiddle";
@@ -15,7 +16,7 @@ const tools = {
   initialState: {
     orders: {
       isFetching: false,
-      fetched:false, // 是否从远程获取过数据
+      fetched: false, // 是否从远程获取过数据
       ids: [], //所有订单
       toPayIds: [], //待付款的订单id
       availableIds: [], //可使用的订单id
@@ -59,7 +60,7 @@ const tools = {
         return {
           ...state,
           isFetching: false,
-          fetched:true,//获取过远程数据
+          fetched: true,//获取过远程数据
           ids: state.ids.concat(ids),
           toPayIds: state.toPayIds.concat(toPayIds),
           availableIds: state.availableIds.concat(availableIds),
@@ -265,10 +266,14 @@ export default reducer;
 // selectors
 export const selectorUser = {
   getCurrentTab: state => state.user.currentTab,
-  // 根据currentTab获取不同类型的order
-  getOrders: state => {
-    const key = ["ids", "toPayIds", "availableIds", "refundIds"][state.user.currentTab];
-    return state.user.orders[key].map(id => selectorOrder.getOrderById(state, id));
+  getUserOrders: state => state.user.orders,
+  // reselect 根据currentTab获取不同类型的order
+  getOrders: (state) => {
+    //! 同purchase中的getTotalPrice一样使用了函数进行了包装,进行了延时加载
+    return createSelector([selectorUser.getCurrentTab, selectorUser.getUserOrders, selectorOrder.getAllOrders], (tabIndex, userOrders, orders) => {
+      const key = ["ids", "toPayIds", "availableIds", "refundIds"][tabIndex];
+      return userOrders[key].map(orderId => orders[orderId])
+    })(state);
   },
   // 获取正在删除的订单Id
   getDeletingOrderId: (state) => {
