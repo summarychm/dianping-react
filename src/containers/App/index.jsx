@@ -5,16 +5,29 @@ import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 
 import ErrorToast from "../../components/ErrorToast";
 import PrivateRoute from "../PrivateRoute";
+import AsyncComponent from "../../utils/AsyncComponent";
 
-import Home from '../Home';
-import ProductDetail from '../ProductDetail';
-import Search from "../Search";
-import SearchResult from "../SearchResult";
-import Login from "../Login";
-import User from "../User";
-import Purchase from "../Purchase"
+// import Home from '../Home';
+// import ProductDetail from '../ProductDetail';
+// import Search from "../Search";
+// import SearchResult from "../SearchResult";
+// import Login from "../Login";
+// import User from "../User";
+// import Purchase from "../Purchase"
 
 import {actions as actionsApp, selectorApp} from '../../redux/modules/app';
+
+//dynamic import() 组件按照路由动态加载
+const Home = AsyncComponent(() => import('../Home'));
+const ProductDetail = AsyncComponent(() => import('../ProductDetail'));
+const Search = AsyncComponent(() => import("../Search"));
+const SearchResult = AsyncComponent(() => import("../SearchResult"));
+const Login = AsyncComponent(() => import("../Login"));
+const User = AsyncComponent(() => import("../User"));
+const Purchase = AsyncComponent(() => import("../Purchase"));
+
+
+
 
 class App extends React.Component {
   render() {
