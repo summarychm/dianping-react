@@ -15,6 +15,7 @@ const tools = {
   initialState: {
     orders: {
       isFetching: false,
+      fetched:false, // 是否从远程获取过数据
       ids: [], //所有订单
       toPayIds: [], //待付款的订单id
       availableIds: [], //可使用的订单id
@@ -58,6 +59,7 @@ const tools = {
         return {
           ...state,
           isFetching: false,
+          fetched:true,//获取过远程数据
           ids: state.ids.concat(ids),
           toPayIds: state.toPayIds.concat(toPayIds),
           availableIds: state.availableIds.concat(availableIds),
@@ -177,7 +179,7 @@ export const actionUser = {
   loadOrders: () => {
     return (dispatch, getState) => {
       const {ids} = getState().user.orders;
-      if (ids.length > 0) return null;
+      if (tools.initialState.orders.fetchOrders) return null;
       const endpoint = urls.getOrders();
       return dispatch(tools.fetchOrders(endpoint));
     };
